@@ -157,17 +157,7 @@ public class IllusionRiddleLevel extends DevDungeonLevel implements ITickable {
 
       setupTPTargets();
 
-      // Open Pits for last room (boss room) and extinguish torches
-      this.rooms.getLast().tiles().stream()
-          .filter(t -> t.levelElement() == LevelElement.PIT)
-          .map(t -> (PitTile) t)
-          .forEach(PitTile::open);
-      for (Entity torch : this.rooms.getLast().torches()) {
-        torch
-            .fetch(InteractionComponent.class)
-            .orElseThrow(() -> MissingComponentException.build(torch, InteractionComponent.class))
-            .triggerInteraction(torch, Game.hero().orElse(null));
-      }
+      prepareBossRoom();
 
       Entity b =
           EntityUtils.spawnBoss(
@@ -256,6 +246,22 @@ public class IllusionRiddleLevel extends DevDungeonLevel implements ITickable {
     }
 
     this.riddleHandler.onTick(isFirstTick);
+  }
+
+  /**
+   * Open Pits for last room (boss room) and extinguish torches
+   */
+  private void prepareBossRoom() {
+	this.rooms.getLast().tiles().stream()
+          .filter(t -> t.levelElement() == LevelElement.PIT)
+          .map(t -> (PitTile) t)
+          .forEach(PitTile::open);
+      for (Entity torch : this.rooms.getLast().torches()) {
+        torch
+            .fetch(InteractionComponent.class)
+            .orElseThrow(() -> MissingComponentException.build(torch, InteractionComponent.class))
+            .triggerInteraction(torch, Game.hero().orElse(null));
+      }
   }
 
   /**
